@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package protocol;
+
+enum ItemType
+{
+        USERITEM  = 0;
+        EQUIPMENT = 1;
+};
+message ItemInfo
+{
+        int32 ID = 1;
+        int32 Type = 2;
+        string Name = 3;
+        int32 Amount = 4;
+};

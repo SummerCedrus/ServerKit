@@ -25,6 +25,7 @@ func msgHandle(msg *ClientMsg) (err interface{}){
 		case cls, ok := <-msg.CloseChan:
 			if ok && cls {
 				close(msg.MsgChan)
+				ShowDown()
 			}
 
 			return 0
