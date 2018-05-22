@@ -2,49 +2,42 @@ package netkit
 
 import (
 	"fmt"
-	//"net"
 	"net"
-	//"io/ioutil"
 )
-func NewServer(addr string) (*ClientMsg, error){
-	msg := ClientMsg{
-		MsgChan: make(chan [] byte, 5),
-		//CloseChan: make(chan bool),
+var mgr *ConnectMgr
+func NewServer(addr string) (*ConnectMgr, error) {
+	mgr = &ConnectMgr{
+		MsgChan: make(chan *Message, MaxMsgNum),
+		ConnectChan: make(chan *Receiver, MaxSessionNum),
+		CloseChan: make(chan bool),
+		ReceiverPool:make(map[int32]*Receiver, MaxSessionNum),
 	}
 	tcpAddr, err := net.ResolveTCPAddr("tcp4", addr)
 
-	if nil != err{
-		return &msg, err
+	if nil != err {
+		return mgr, err
 	}
 
 	listener, err := net.ListenTCP("tcp4", tcpAddr)
 
-	if nil != err{
-		return &msg, err
+	if nil != err {
+		return mgr, err
 	}
 
 	go func() {
 		for {
-			conn, err := listener.Accept()
+			conn, err := listener.AcceptTCP()
 			if err != nil {
 				fmt.Println("Accept failed: ", err)
 				continue
 			}
-			buff := make([]byte, 20)
-			_, err = conn.Read(buff)
-
-			if err != nil {
-				fmt.Println("Read failed: ", err)
-				continue
-			}
-			fmt.Println(buff)
-			msg.MsgChan <- buff
+			NewReciever(conn)
 		}
 	}()
 
-	return &msg, nil
+	return mgr, nil
 }
 
-func CloseServer(msg *ClientMsg)  {
-	close(msg.MsgChan)
+func CloseServer() {
+	close(mgr.MsgChan)
 }

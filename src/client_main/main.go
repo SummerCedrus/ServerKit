@@ -7,10 +7,18 @@ import (
 )
 
 func main(){
-	conn := ConnectServer("127.0.0.1:8080", "tcp4")
-	conn.Write([]byte("Hello Server!"))
-	fmt.Println("Send 'Hello Server!'")
+
+	session := NewClient("127.0.0.1:8080", "tcp4")
+
+	if nil == session{
+		fmt.Errorf("connect server [%s] failed", "127.0.0.1:8080")
+		return
+	}
+
 	for {
-		time.Sleep(time.Second)
+		session.Send([]byte("Hello Server!!!"))
+
+		time.Sleep(20*time.Second)
 	}
 }
+

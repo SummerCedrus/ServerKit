@@ -3,29 +3,38 @@ package main
 import (
 	"fmt"
 	."netkit"
+	//"github.com/golang/protobuf/proto"
 )
 
 func main(){
-	msg, err := NewServer("127.0.0.1:8080")
+	mgr, err := NewServer("127.0.0.1:8080")
 
 	if nil != err{
 		fmt.Errorf("Create New Server Error [%s]", err.Error())
 	}
-	mainWork(msg)
+
+	mainWork(mgr)
 }
 
-func msgHandle(msg *ClientMsg) (err interface{}){
+func msgHandle(mgr *ConnectMgr) (err interface{}){
 	for {
 		select {
-		case b, ok := <-msg.MsgChan:
-
+		case msg, ok := <-mgr.MsgChan:
 			if ok {
-				fmt.Println(string(b))
+				fmt.Println(msg.Data)
+				if nil != err {
+					continue
+				}
+				fmt.Println(string(msg.Data))
 			}
-		case cls, ok := <-msg.CloseChan:
+		case _, ok := <-mgr.ConnectChan:
+			if ok {
+				continue
+			}
+		case cls, ok := <-mgr.CloseChan:
 			if ok && cls {
-				close(msg.MsgChan)
 				ShowDown()
+				return
 			}
 
 			return 0
@@ -33,9 +42,9 @@ func msgHandle(msg *ClientMsg) (err interface{}){
 	}
 }
 
-func mainWork(msg *ClientMsg){
+func mainWork(mgr *ConnectMgr){
 	for retryCnt := 0; retryCnt < MAX_CONNECT_RETRY_TIME;{
-		err := msgHandle(msg)
+		err := msgHandle(mgr)
 		if nil == err{
 			break
 		}else{
