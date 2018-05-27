@@ -5,3 +5,7 @@
 .idea/workspace.xml
 *.exe
 *.a
+bin/client_main
+bin/server_main
+bin/client_main
+bin/client_main

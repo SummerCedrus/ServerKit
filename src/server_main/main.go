@@ -21,10 +21,10 @@ func msgHandle(mgr *ConnectMgr) (err interface{}){
 		select {
 		case msg, ok := <-mgr.MsgChan:
 			if ok {
-				fmt.Println(msg.Data)
 				if nil != err {
 					continue
 				}
+				fmt.Println(msg.Cmd)
 				fmt.Println(string(msg.Data))
 			}
 		case _, ok := <-mgr.ConnectChan:

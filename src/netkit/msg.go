@@ -37,13 +37,15 @@ func NewSender(conn *net.TCPConn) *Sender{
 	return sender
 }
 //send data
-func Send(conn *net.TCPConn, data []byte) (int, error){
+func Send(conn *net.TCPConn, msg *Message) (int, error){
+	data := Packet(msg)
 	data, err := EncryptDES_CBC(data)
 	if nil != err{
 		fmt.Errorf("encrypt failed![%s]", err.Error())
 	}
 
 	fmt.Println(data)
+
 
 	return conn.Write(data)
 }
@@ -68,7 +70,7 @@ func (sender *Sender) run() {
 			select {
 			case msg, ok := <-sender.Queue:
 				if ok {
-					cnt, err := Send(sender.Conn, msg.Data)
+					cnt, err := Send(sender.Conn, msg)
 					if nil != err{
 						fmt.Printf("cnt[%d] %s", cnt, err.Error())
 						sender.Conn = ReConnectServer(sender.Conn)
@@ -93,12 +95,10 @@ func (receiver *Receiver) readMsg() error {
 	}
 	fmt.Println(buff)
 	data, err := DecryptDES_CBC(buff)
+	msg := UnPacket(data)
 	if nil != err {
 		fmt.Errorf("Decrypt failed![%s]", err.Error())
 		return err
-	}
-	msg := &Message{
-		Data: data,
 	}
 	receiver.MsgChan <- msg
 

@@ -29,6 +29,6 @@ type Sender struct {
 }
 
 type Message struct {
-	Cmd  int16
+	Cmd  int32
 	Data []byte
 }
