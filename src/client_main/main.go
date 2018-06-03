@@ -4,6 +4,7 @@ import (
 	."netkit"
 	"time"
 	"fmt"
+	."protocol"
 )
 
 func main(){
@@ -16,9 +17,21 @@ func main(){
 	}
 
 	for {
-		session.Send([]byte("Hello Server!!!"))
+		info := ItemInfo{
+			ID:1,
+			Type:2,
+			Name:"sword_1",
+			Amount:1,
+		}
 
-		time.Sleep(20*time.Second)
+		msg := &Message{
+			Cmd:CMD_GET_ITEM_INFO_REQ,
+			Msg:&info,
+		}
+
+		session.Send(msg)
+
+		time.Sleep(10*time.Second)
 	}
 }
 

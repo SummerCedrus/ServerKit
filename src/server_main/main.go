@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	."netkit"
-	//"github.com/golang/protobuf/proto"
+
 )
 
 func main(){
@@ -25,7 +25,7 @@ func msgHandle(mgr *ConnectMgr) (err interface{}){
 					continue
 				}
 				fmt.Println(msg.Cmd)
-				fmt.Println(string(msg.Data))
+				fmt.Println(msg.Msg.String())
 			}
 		case _, ok := <-mgr.ConnectChan:
 			if ok {

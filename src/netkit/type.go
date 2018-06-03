@@ -1,6 +1,9 @@
 package netkit
 
-import "net"
+import (
+	"net"
+	"github.com/golang/protobuf/proto"
+)
 
 const (
 	MaxSessionNum = 20
@@ -29,6 +32,6 @@ type Sender struct {
 }
 
 type Message struct {
-	Cmd  int32
-	Data []byte
+	Cmd uint32
+	Msg proto.Message
 }

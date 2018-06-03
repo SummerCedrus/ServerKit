@@ -38,13 +38,17 @@ func NewSender(conn *net.TCPConn) *Sender{
 }
 //send data
 func Send(conn *net.TCPConn, msg *Message) (int, error){
-	data := Packet(msg)
-	data, err := EncryptDES_CBC(data)
+	data, err := Packet(msg)
+	if nil != err{
+		return 0, err
+	}
+	fmt.Println(data)
+	data, err = EncryptDES_CBC(data)
 	if nil != err{
 		fmt.Errorf("encrypt failed![%s]", err.Error())
 	}
 
-	fmt.Println(data)
+	fmt.Println("Encrypted", data)
 
 
 	return conn.Write(data)
@@ -57,10 +61,7 @@ func (mgr *ConnectMgr)GetReceiver(id int32) *Receiver{
 func (mgr *ConnectMgr)DelReceiver(id int32){
 	delete(mgr.ReceiverPool, id)
 }
-func (sender *Sender)Send(data []byte){
-	msg := &Message{
-		Data: data,
-	}
+func (sender *Sender)Send(msg *Message){
 	sender.Queue <- msg
 }
 
@@ -95,7 +96,8 @@ func (receiver *Receiver) readMsg() error {
 	}
 	fmt.Println(buff)
 	data, err := DecryptDES_CBC(buff)
-	msg := UnPacket(data)
+	fmt.Println("Decrypted ",data)
+	msg, err := UnPacket(data)
 	if nil != err {
 		fmt.Errorf("Decrypt failed![%s]", err.Error())
 		return err
