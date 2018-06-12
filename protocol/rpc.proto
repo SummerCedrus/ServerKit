@@ -1,0 +1,23 @@
+//Rpc Serivce Define
+syntax = "proto3";
+
+package protocol;
+
+// calculator service definition
+service Calculator {
+  rpc Add (CalParam) returns (CalResult) {}
+  rpc Sub (CalParam) returns (CalResult) {}
+  rpc Mul (CalParam) returns (CalResult) {}
+  rpc Div (CalParam) returns (CalResult) {}
+}
+
+// The request message containing the user's name.
+message CalParam {
+  int32 a = 1;
+  int32 b = 2;
+}
+
+// The response message containing the greetings
+message CalResult {
+  int32 result = 1;
+}
