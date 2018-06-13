@@ -3,10 +3,10 @@ package main
 
 import (
 	"log"
+	."protocol"
+	"netkit"
 	"time"
-
 	"golang.org/x/net/context"
-	"google.golang.org/grpc"
 )
 
 const (
@@ -15,22 +15,19 @@ const (
 
 func main() {
 	// Set up a connection to the server.
-	conn, err := grpc.Dial(address, grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("did not connect: %v", err)
+	c := netkit.NewRpcClient(address)
+	if nil == c {
+		return
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer func() {
-		conn.Close()
-		cancel()
-	}()
-	c := NewCalculatorClient(conn)
-
-	// Contact the server and print out its response.
-
-	r, err := c.Add(ctx, &CalParam{A:3,B:2})
-	if err != nil {
-		log.Fatalf("could not cal: %v", err)
+	for  {
+		time.Sleep(5*time.Second)
+		r, err := c.Add(context.Background(), &CalParam{A:3,B:2})
+		if err != nil {
+			log.Printf("could not cal: %v", err)
+			continue
+		}
+		log.Printf("Result: %d", r.GetResult())
 	}
-	log.Printf("Result: %d", r.GetResult())
+
 }
+

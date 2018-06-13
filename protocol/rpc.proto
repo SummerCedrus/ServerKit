@@ -1,10 +1,10 @@
-//Rpc Serivce Define
+//Rpc Service Define
 syntax = "proto3";
 
 package protocol;
 
 // calculator service definition
-service Calculator {
+service RpcSevice {
   rpc Add (CalParam) returns (CalResult) {}
   rpc Sub (CalParam) returns (CalResult) {}
   rpc Mul (CalParam) returns (CalResult) {}
