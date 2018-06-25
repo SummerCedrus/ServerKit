@@ -3,9 +3,8 @@ package dbkit
 import (
 	"gopkg.in/mgo.v2"
 	"fmt"
-)
-const(
-	DEFAULT_MGO_DB = "127.0.0.1:27017"
+	"misc"
+	"gopkg.in/mgo.v2/bson"
 )
 
 const(
@@ -15,37 +14,44 @@ const(
 )
 
 type MgoDBO struct {
-	session *mgo.Session
+	Name string
+	Info *mgo.DialInfo
+	Session *mgo.Session
 }
-func NewSession() *MgoDBO{
-	session, _ := connectDB(DEFAULT_MGO_DB)
+
+func NewDbo(SessionName string, mode int, hosts []string, databaseName string, username string, password string) *MgoDBO{
+	info := &mgo.DialInfo{
+		Addrs:hosts,
+		Database:databaseName,
+		Username:username,
+		Password:password,
+	}
+	session, _ := connectDB(info)
 
 	dbo := &MgoDBO{
-		session:session,
+		Name:SessionName,
+		Info:info,
+		Session:session,
 	}
 
-	return dbo
-}
-func NewSessionWithURL(addr string) *MgoDBO{
-	session, _ := connectDB(addr)
-
-	dbo := &MgoDBO{
-		session:session,
-	}
-
+	SessionMgr.Add(SessionName, dbo)
+	dbo.SetMode(mode, true)
 	return dbo
 }
 
-func connectDB(addr string) (*mgo.Session, error){
-	session, err := mgo.Dial(addr)
+func connectDB(info *mgo.DialInfo) (*mgo.Session, error){
+	session, err := mgo.DialWithInfo(info)
 	if nil != err{
-		msg := fmt.Sprintf("conncet addr[%s] failed", addr)
+		msg := fmt.Sprintf("conncet addr[%s] failed", info.Addrs)
 		panic(msg)
 		return nil, err
 	}
 	return session, err
 }
 func (dbo *MgoDBO) SetMode(mode int, refresh bool) {
+	if !dbo.checkSession(){
+		return
+	}
 	m := mgo.Strong
 	switch mode {
 	case EVENTUAL:
@@ -53,9 +59,89 @@ func (dbo *MgoDBO) SetMode(mode int, refresh bool) {
 	case MONOTONIC:
 		m = mgo.Monotonic
 	}
-	dbo.session.SetMode(m, refresh)
+	dbo.Session.SetMode(m, refresh)
 }
 
-func (dbo *MgoDBO) Insert(){
-	dbo.session.Clone()
+func (dbo *MgoDBO) Insert(dbName string, colName string, docs interface{}) bool{
+	if !dbo.checkSession(){
+		return false
+	}
+	session := dbo.Session.Clone()
+	defer session.Close()
+	err := session.DB(dbName).C(colName).Insert(docs)
+	if nil != err{
+		misc.Errorf("Insert [%s] [%s] error[%s]", dbName, colName, err.Error())
+		return false
+	}
+
+	return true
+}
+//Update One Record Match The Condtion
+func (dbo *MgoDBO) UpdateOne(dbName string, colName string, cond,docs interface{}) bool{
+	if !dbo.checkSession(){
+		return false
+	}
+	session := dbo.Session.Clone()
+	defer session.Close()
+	err := session.DB(dbName).C(colName).Update(cond,bson.M{"$set":docs})
+	if nil != err{
+		misc.Errorf("UpdateOne [%s] [%s] error[%s]", dbName, colName, err.Error())
+		return false
+	}
+
+	return true
+}
+
+//Update All Record Match The Condtion
+func (dbo *MgoDBO) UpdateAll(dbName string, colName string, cond, docs interface{}) bool{
+	if !dbo.checkSession(){
+		return false
+	}
+	session := dbo.Session.Clone()
+	defer session.Close()
+	chgInfo ,err := session.DB(dbName).C(colName).UpdateAll(cond,bson.M{"$set":docs})
+	if nil != err{
+		misc.Errorf("UpdateAll [%s] [%s] error[%s]", dbName, colName, err.Error())
+		return false
+	}
+	misc.Logf("UpdateAll Updated[%d]Removed[%d]Matched[%d]", chgInfo.Updated, chgInfo.Removed, chgInfo.Matched)
+	return true
+}
+
+func (dbo *MgoDBO) Delete(dbName string, colName string, cond interface{}) bool{
+	if !dbo.checkSession(){
+		return false
+	}
+	session := dbo.Session.Clone()
+	defer session.Close()
+	err := session.DB(dbName).C(colName).Remove(cond)
+	if nil != err{
+		misc.Errorf("Update [%s] [%s] error[%s]", dbName, colName, err.Error())
+		return false
+	}
+
+	return true
+}
+
+func (dbo *MgoDBO) Upsert(dbName string, colName string, cond, docs interface{}) bool{
+	if !dbo.checkSession(){
+		return false
+	}
+	session := dbo.Session.Clone()
+	defer session.Close()
+	chgInfo, err := session.DB(dbName).C(colName).Upsert(cond, bson.M{"$set":docs})
+	if nil != err{
+		misc.Errorf("Update [%s] [%s] error[%s]", dbName, colName, err.Error())
+		return false
+	}
+	misc.Logf("Upsert Updated[%d]Removed[%d]Matched[%d]", chgInfo.Updated, chgInfo.Removed, chgInfo.Matched)
+	return true
+}
+
+func (dbo *MgoDBO)checkSession() bool{
+	if nil  == dbo.Session{
+		misc.Errorf("[%s]Session is invaild!!!", dbo.Name)
+		return false
+	}
+	return true
 }
