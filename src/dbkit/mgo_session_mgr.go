@@ -29,3 +29,7 @@ func (sp *SessionPool) Del(sessionName string) bool{
 
 	return true
 }
+
+func (sp *SessionPool) GetSessionCnt() int8 {
+	return int8(len(sp.Pool))
+}

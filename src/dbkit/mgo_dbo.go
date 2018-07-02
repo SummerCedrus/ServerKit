@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"misc"
 	"gopkg.in/mgo.v2/bson"
+	"errors"
 )
 
 const(
@@ -107,7 +108,7 @@ func (dbo *MgoDBO) UpdateAll(dbName string, colName string, cond, docs interface
 	misc.Logf("UpdateAll Updated[%d]Removed[%d]Matched[%d]", chgInfo.Updated, chgInfo.Removed, chgInfo.Matched)
 	return true
 }
-
+//Remove One Record Match The Condtion
 func (dbo *MgoDBO) Delete(dbName string, colName string, cond interface{}) bool{
 	if !dbo.checkSession(){
 		return false
@@ -116,9 +117,27 @@ func (dbo *MgoDBO) Delete(dbName string, colName string, cond interface{}) bool{
 	defer session.Close()
 	err := session.DB(dbName).C(colName).Remove(cond)
 	if nil != err{
+		misc.Errorf("Delete [%s] [%s] error[%s]", dbName, colName, err.Error())
+		return false
+	}
+
+	return true
+}
+
+//Remove All Record Match The Condtion
+func (dbo *MgoDBO) DeleteAll(dbName string, colName string, cond interface{}) bool{
+	if !dbo.checkSession(){
+		return false
+	}
+	session := dbo.Session.Clone()
+	defer session.Close()
+	chgInfo, err := session.DB(dbName).C(colName).RemoveAll(cond)
+	if nil != err{
 		misc.Errorf("Update [%s] [%s] error[%s]", dbName, colName, err.Error())
 		return false
 	}
+
+	misc.Logf("DeleteAll Updated[%d]Removed[%d]Matched[%d]", chgInfo.Updated, chgInfo.Removed, chgInfo.Matched)
 
 	return true
 }
@@ -138,6 +157,35 @@ func (dbo *MgoDBO) Upsert(dbName string, colName string, cond, docs interface{})
 	return true
 }
 
+func (dbo *MgoDBO) FindOne(dbName string, colName string, cond interface{}, result bson.M) error{
+	if !dbo.checkSession(){
+		return errors.New("Find failed")
+	}
+	session := dbo.Session.Clone()
+	defer session.Close()
+	q := session.DB(dbName).C(colName).Find(cond)
+
+	return q.One(result)
+}
+
+func (dbo *MgoDBO) FindAll(dbName string, colName string, cond interface{}, handle func(m bson.M) error) error{
+	if !dbo.checkSession(){
+		return errors.New("Session is invaild")
+	}
+	session := dbo.Session.Clone()
+	defer session.Close()
+	q := session.DB(dbName).C(colName).Find(cond)
+	iter := q.Iter()
+	b := make(bson.M)
+	for true == iter.Next(b){
+		err := handle(b)
+		if nil != err{
+			return err
+		}
+	}
+
+	return nil
+}
 func (dbo *MgoDBO)checkSession() bool{
 	if nil  == dbo.Session{
 		misc.Errorf("[%s]Session is invaild!!!", dbo.Name)

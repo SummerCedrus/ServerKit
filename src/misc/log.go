@@ -115,9 +115,20 @@ func Error(v ...interface{}){
 	logger.Println(s)
 }
 
+func Fatalf(format string, v ...interface{}){
+	s := commonf(ERROR, format, v ...)
+	logger := getLogger(err)
+	logger.Fatalf(s)
+}
+
+func Fatal(v ...interface{}){
+	s := common(ERROR, v ...)
+	logger := getLogger(err)
+	logger.Fatalln(s)
+}
+
 func common(tag string, v ...interface{}) string{
 	s := fmt.Sprint(v ...)
-	//fmt.Println(s)
 	s = formatLog(tag, s)
 	log.Println(s)
 
