@@ -1,11 +1,10 @@
 package misc
 
 import (
-	"path/filepath"
-	"path"
-	"os"
-	"log"
 	"fmt"
+	"log"
+	"os"
+	"path/filepath"
 	"runtime"
 )
 
@@ -27,12 +26,12 @@ func init() {
 }
 func InitLog(typ string, fileName string) *log.Logger{
 	logPath, _ := filepath.Abs("")
-	logPath, _ = path.Split(logPath)
+	//logPath, _ = path.Split(logPath)
 	fileName = fileName + "_" + typ + ".log"
 	logPath = filepath.Join(logPath,"log",fileName)
 	file, err := os.OpenFile(logPath,os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0666)
 	if nil != err{
-		fmt.Println("open file failed [%s]", err.Error())
+		fmt.Printf("open file failed [%s]", err.Error())
 		panic("init log failed!")
 		return nil
 	}

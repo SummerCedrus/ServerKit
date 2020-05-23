@@ -1,9 +1,11 @@
 package misc
 
 import (
-	"encoding/gob"
 	"bytes"
+	"encoding/gob"
 	"gopkg.in/mgo.v2/bson"
+	"io/ioutil"
+	"strconv"
 )
 
 //序列化struct
@@ -58,4 +60,41 @@ func M2Struct(in bson.M, out interface{}) error{
 	}
 
 	return nil
+}
+
+func GetAllFileName(Dir string) ([]string, error){
+	files , err := ioutil.ReadDir(Dir)
+	filenames := make([]string, 0)
+	if nil != err{
+		Errorf("bson.Marshal Failed Error[%s]", err.Error())
+		return filenames, err
+	}
+	for _, file := range files {
+		if file.IsDir(){
+			continue
+		}
+		filenames = append(filenames, file.Name())
+	}
+
+	return filenames, nil
+}
+func Stoi(s string) int{
+	i, err := strconv.Atoi(s)
+	if nil != err{
+		Errorf("Sto32 Error %v", err)
+		return 0
+	}
+
+	return i
+}
+func Sto32(s string) int32{
+	return int32(Stoi(s))
+}
+
+func Sto64(s string)  int64{
+	return int64(Stoi(s))
+}
+
+func ItoS(i int) string{
+	return strconv.Itoa(i)
 }

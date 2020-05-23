@@ -1,11 +1,13 @@
-package main
+package hotplugin
 
-import ("fmt"
+import (
+	"fmt"
 	"path/filepath"
-	"plugin")
+	"plugin"
+)
 
 func main() {
-	rootPath,err := filepath.Abs("testplugin.so")
+	rootPath,err := filepath.Abs("plugins/testplugin.so")
 	if nil != err{
 		panic(err)
 	}

@@ -2,17 +2,21 @@ package main
 
 import (
 	"fmt"
+	"hotplugin"
+	"misc"
 	."netkit"
 
 )
 
 func main(){
+	misc.InitLog("run", "server")
+	hotplugin.Run()
 	mgr, err := NewServer("127.0.0.1:8080")
 
 	if nil != err{
 		fmt.Errorf("Create New Server Error [%s]", err.Error())
 	}
-
+	hotplugin.Call("testplugin","Hello")
 	mainWork(mgr)
 }
 
