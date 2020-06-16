@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github/SummerCedrus/ServerKit/misc"
+	"github.com/SummerCedrus/ServerKit/misc"
 )
 
 func main()  {

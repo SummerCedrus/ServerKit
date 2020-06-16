@@ -3,7 +3,7 @@ package rpc_serivce
 
 import (
 	"golang.org/x/net/context"
-	."github/SummerCedrus/ServerKit/protocol"
+	."github.com/SummerCedrus/ServerKit/protocol"
 	"errors"
 )
 //server is used to implement rpcSeviceClient

@@ -1,4 +1,4 @@
-module github/SummerCedrus/ServerKit
+module github.com/SummerCedrus/ServerKit
 
 go 1.14
 

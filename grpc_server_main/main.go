@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github/SummerCedrus/ServerKit/netkit"
+	"github.com/SummerCedrus/ServerKit/netkit"
 )
 
 const (

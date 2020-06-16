@@ -1,10 +1,10 @@
 package main
 
 import (
-	."github/SummerCedrus/ServerKit/netkit"
+	."github.com/SummerCedrus/ServerKit/netkit"
 	"time"
 	"fmt"
-	."github/SummerCedrus/ServerKit/protocol"
+	."github.com/SummerCedrus/ServerKit/protocol"
 )
 
 func main(){

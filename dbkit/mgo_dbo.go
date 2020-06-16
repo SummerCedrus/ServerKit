@@ -3,7 +3,7 @@ package dbkit
 import (
 	"gopkg.in/mgo.v2"
 	"fmt"
-	"github/SummerCedrus/ServerKit/misc"
+	"github.com/SummerCedrus/ServerKit/misc"
 	"gopkg.in/mgo.v2/bson"
 	"errors"
 )

@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github/SummerCedrus/ServerKit/hotplugin"
-	"github/SummerCedrus/ServerKit/misc"
-	."github/SummerCedrus/ServerKit/netkit"
+	"github.com/SummerCedrus/ServerKit/hotplugin"
+	"github.com/SummerCedrus/ServerKit/misc"
+	."github.com/SummerCedrus/ServerKit/netkit"
 
 )
 

@@ -3,13 +3,13 @@ package netkit
 
 import (
 
-	."github/SummerCedrus/ServerKit/protocol"
+	."github.com/SummerCedrus/ServerKit/protocol"
 
 	"google.golang.org/grpc"
 	"log"
 	"net"
 	"google.golang.org/grpc/reflection"
-	"github/SummerCedrus/ServerKit/rpc_serivce"
+	"github.com/SummerCedrus/ServerKit/rpc_serivce"
 )
 //缺省创建rpc客户端
 func NewRpcClient(address string)(RpcSeviceClient){

@@ -3,8 +3,8 @@ package main
 
 import (
 	"log"
-	."github/SummerCedrus/ServerKit/protocol"
-	"github/SummerCedrus/ServerKit/netkit"
+	."github.com/SummerCedrus/ServerKit/protocol"
+	"github.com/SummerCedrus/ServerKit/netkit"
 	"time"
 	"golang.org/x/net/context"
 )

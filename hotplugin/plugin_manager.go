@@ -3,7 +3,7 @@ package hotplugin
 import (
 	"errors"
 	"fmt"
-	. "github/SummerCedrus/ServerKit/misc"
+	. "github.com/SummerCedrus/ServerKit/misc"
 	"path/filepath"
 	"strings"
 	"time"

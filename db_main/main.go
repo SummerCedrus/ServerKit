@@ -2,8 +2,8 @@ package main
 //dbo test
 import (
 	//."dbkit"
-	."github/SummerCedrus/ServerKit/misc"
-	"github/SummerCedrus/ServerKit/protocol"
+	."github.com/SummerCedrus/ServerKit/misc"
+	"github.com/SummerCedrus/ServerKit/protocol"
 	"fmt"
 	"gopkg.in/mgo.v2/bson"
 )

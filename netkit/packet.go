@@ -3,7 +3,7 @@ package netkit
 import (
 	"github.com/golang/protobuf/proto"
 	"fmt"
-	"github/SummerCedrus/ServerKit/protocol"
+	"github.com/SummerCedrus/ServerKit/protocol"
 )
 
 //消息打包约定结构
