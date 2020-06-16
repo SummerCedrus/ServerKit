@@ -1,5 +1,6 @@
 # ServerKit
-## How To Begin
+
+## How To Begin TEST DEMO
 1.Set You $GOROOT and $GOPATH correct
 
 2.Install protoc(can find here -> ServerKit/src/github.com/)
@@ -26,7 +27,7 @@ Hotplugin is base on plugin package.It can reload ''.so" automatically.
 
 1.Code in $GOPATH/src/plugins
 
-2.Make plug--It will build ".so" to $GOPATH/plugins
+2.make plug--It will build ".so" to $GOPATH/plugins
 
 3.Use hotplugin.Call to Call function in your ".so"
 

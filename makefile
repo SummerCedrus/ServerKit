@@ -1,15 +1,14 @@
-GOPATH := $(shell pwd)
 all:
-	GOPATH=$(GOPATH) go install server_main
-	GOPATH=$(GOPATH) go install client_main
-	go build -o plugins -buildmode=plugin src/plugins/*	
+	go install client_main/client_main.go	
+	go install server_main/server_main.go
+	go build -o plugins -buildmode=plugin test_plugin/*	
 c:	
-	GOPATH=$(GOPATH) go install client_main
+	go install client_main/client_main.go
 s:
-	GOPATH=$(GOPATH) go install server_main
+	go install server_main/server_main.go
 plug:  
 	#$(shell rm ./plugins/*)
-	go build -o plugins -buildmode=plugin src/plugins/*
+	go build -o plugins -buildmode=plugin test_plugin/*
 	bash make_plug.sh
 p:
 	bash make_proto.sh
