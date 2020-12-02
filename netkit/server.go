@@ -2,10 +2,16 @@ package netkit
 
 import (
 	"fmt"
+	"github.com/SummerCedrus/ServerKit/protocol"
+	"github.com/golang/protobuf/proto"
 	"net"
 )
 var mgr *ConnectMgr
-func NewServer(addr string) (*ConnectMgr, error) {
+func NewServer(addr string, f func(Cmd uint32)(proto.Message, error)) (*ConnectMgr, error) {
+	if nil == f{
+		f = protocol.ReflectMessage
+	}
+	SetReflectFunc(f)
 	mgr = &ConnectMgr{
 		MsgChan: make(chan *Message, MaxMsgNum),
 		ConnectChan: make(chan *Receiver, MaxSessionNum),
@@ -37,7 +43,6 @@ func NewServer(addr string) (*ConnectMgr, error) {
 
 	return mgr, nil
 }
-
 func CloseServer() {
 	close(mgr.MsgChan)
 }
