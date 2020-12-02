@@ -5,14 +5,14 @@ import (
 	"github.com/SummerCedrus/ServerKit/hotplugin"
 	"github.com/SummerCedrus/ServerKit/misc"
 	."github.com/SummerCedrus/ServerKit/netkit"
-
+	"github.com/SummerCedrus/ServerKit/protocol"
 )
 
 func main(){
 	misc.InitLog("run", "server")
 	//hotplugin.Run()
 	mgr, err := NewServer("127.0.0.1:8080")
-
+	SetReflectFunc(protocol.ReflectMessage)
 	if nil != err{
 		fmt.Errorf("Create New Server Error [%s]", err.Error())
 	}

@@ -1,16 +1,18 @@
 package netkit
 
 import (
-	"github.com/golang/protobuf/proto"
 	"fmt"
-	"github.com/SummerCedrus/ServerKit/protocol"
+	"github.com/golang/protobuf/proto"
 )
 
 //消息打包约定结构
 //|________|________________|_____________________
 //	2 byte |  4 byte        |
 //len(body)| cmd            |  body(data)
-
+var reflectFunc func(Cmd uint32)(proto.Message, error)
+func SetReflectFunc(f func(Cmd uint32)(proto.Message, error)){
+	reflectFunc = f
+}
 func Packet(msg *Message) ([]byte, error){
 	//序列化msg.Msg
 	data, err := encode(msg.Cmd, msg.Msg)
@@ -45,7 +47,7 @@ func UnPacket(netMsg []byte) (*Message, error){
 	buff = netMsg[2:6]
 	cmd := uint32(buff[0]) << 24 | uint32(buff[1]) << 16 | uint32(buff[2]) << 8 | uint32(buff[3])
 	buff = netMsg[6:head+6]
-	pbMsg, err := protocol.ReflectMessage(cmd)
+	pbMsg, err := reflectFunc(cmd)
 	if nil == pbMsg{
 		return nil, err
 	}
