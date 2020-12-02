@@ -7,14 +7,16 @@ import (
 )
 
 func NewClient(addr string, netWork string) *Sender{
-	conn := ConnectServer("127.0.0.1:8080", "tcp4")
+	if "" == netWork{
+		netWork = "tcp4"
+	}
+	conn := ConnectServer(addr, netWork)
 	if nil == conn{
 		fmt.Errorf("err connect server[%s]",addr)
 		return nil
 	}
 	fmt.Println(conn.RemoteAddr(),conn.LocalAddr())
 	sender := NewSender(conn)
-
 	return sender
 }
 
