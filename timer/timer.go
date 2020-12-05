@@ -29,6 +29,8 @@ const (
 type Event struct {
 	ID	int32
 	TriggerMs int64	//触发时间戳(秒)
+	DeltaMs	int64
+	IsRepeat bool
 	Conf	map[int16]int16
 	Func	func(interface{})interface{}
 	Args	interface{}
@@ -63,7 +65,7 @@ func (self *Timer) Run(){
 				}
 				//misc.Debugf("exec event %v %v", self.FRAME_TIME, event.TriggerMs)
 				event.Func(event.Args)
-				if len(event.Conf) <= 0 || event.calNextMs() <= 0{
+				if !event.IsRepeat || event.calNextMs() <= 0{
 					self.delEvent(event.ID)//一次性事件
 				}
 			}
@@ -71,7 +73,7 @@ func (self *Timer) Run(){
 	}()
 }
 //cronStr: "m,h,d"
-func (self *Timer)CreateEvent(deltaMs int64, cronStr string, f func(interface{})interface{}, args interface{}){
+func (self *Timer)CreateEvent(deltaMs int64, isRepeat bool, cronStr string, f func(interface{})interface{}, args interface{}){
 	if deltaMs <= 0 && "" == cronStr{
 		misc.Errorf("params error!!!")
 		return
@@ -80,7 +82,8 @@ func (self *Timer)CreateEvent(deltaMs int64, cronStr string, f func(interface{})
 		misc.Warnf("cronStr is shadow by deltaMs!!!")
 	}
 	event := Event{
-		TriggerMs: deltaMs+Now(),
+		DeltaMs:deltaMs,
+		IsRepeat:isRepeat,
 		Func:f,
 		Args:args,
 		Conf:make(map[int16]int16),
@@ -103,9 +106,8 @@ func (self *Timer)CreateEvent(deltaMs int64, cronStr string, f func(interface{})
 			event.Conf[WEEK] = int16(week)
 		}
 
-		event.calNextMs()
 	}
-
+	event.calNextMs()
 	misc.Debug(event)
 	self.addEvent(&event)
 }
@@ -161,12 +163,16 @@ func (self *Timer) delEvent(id int32){
 }
 
 func (event *Event) calNextMs() int64{
+
+
 	nextMs := CurMidNight()
 	nextWeek, existWeek := event.Conf[WEEK]
 	nextHour, existHour := event.Conf[HOUR]
 	nextMinute, existMinute := event.Conf[MINUTE]
 	//misc.Debugf("%v %v %v", existWeek,existHour,existMinute)
-	if existWeek {//每个周几的几点几分触发
+	if event.DeltaMs > 0{
+		nextMs = Now() + event.DeltaMs
+	}else if existWeek {//每个周几的几点几分触发
 		nowWeek := int16(time.Now().Weekday())
 		deltaDay := int16(0)
 		if nextWeek < nowWeek {
