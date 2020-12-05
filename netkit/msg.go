@@ -4,8 +4,12 @@ import (
 	"net"
 	"fmt"
 	"strings"
+	"time"
 )
 
+const (
+	TCP_TIME_OUT = 60
+)
 func NewReciever(conn *net.TCPConn) {
 	MaxSessionID++
 	receiver := &Receiver{
@@ -88,6 +92,7 @@ func (sender *Sender) run() {
 
 func (receiver *Receiver) readMsg() error {
 	conn := receiver.Conn
+	conn.SetDeadline(time.Now().Add(TCP_TIME_OUT*time.Second))
 	buff := make([]byte, 128)
 	_, err := conn.Read(buff)
 	if err != nil {
