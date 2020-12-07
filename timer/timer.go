@@ -15,6 +15,8 @@ const (
 	//DAY		= 2
 	WEEK	= 3
 	//MONTH	= 4
+	ONE_WEEK_SEC = 604800
+	ONE_WEEK_MS = 604800000
 	ONE_DAY_SEC = 86400
 	ONE_DAY_MS = 86400000
 	ONE_HOUR_SEC = 3600
@@ -163,8 +165,6 @@ func (self *Timer) delEvent(id int32){
 }
 
 func (event *Event) calNextMs() int64{
-
-
 	nextMs := CurMidNight()
 	nextWeek, existWeek := event.Conf[WEEK]
 	nextHour, existHour := event.Conf[HOUR]
@@ -180,12 +180,17 @@ func (event *Event) calNextMs() int64{
 		} else {
 			deltaDay = nextWeek - nowWeek
 		}
+		misc.Debugf("deltaDay %v", deltaDay)
 		nextMs += int64(deltaDay)*ONE_DAY_MS
 		if existHour {
 			nextMs += int64(nextHour) * ONE_HOUR_MS
 		}
 		if existMinute {
 			nextMs += int64(nextMinute) * ONE_MINUTE_MS
+		}
+
+		if Now() > nextMs {
+			nextMs += ONE_WEEK_MS
 		}
 	} else if existHour {//每天的几点几分触发
 		nextMs += int64(nextHour) * ONE_HOUR_MS
